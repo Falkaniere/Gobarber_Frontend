@@ -6,7 +6,7 @@ import * as Yup from 'yup';
 import { FormHandles } from '@unform/core';
 import { Container, Content, Background } from './styles';
 
-import AuthContext from '../../context/AuthContext';
+import { AuthContext } from '../../context/AuthContext';
 import getValidationErros from '../../utils/getValidationErrors';
 
 import Input from '../../components/Input';
@@ -14,14 +14,17 @@ import Button from '../../components/Button';
 
 import logo from '../../assets/logo.svg';
 
+interface SignInFOrmData {
+  email: string;
+  password: string;
+}
+
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const { name } = useContext(AuthContext);
+  const { signIn } = useContext(AuthContext);
 
-  console.log(name);
-
-  const handleSubmit = useCallback(async (data: object) => {
+  const handleSubmit = useCallback(async (data: SignInFOrmData) => {
     try {
       formRef.current?.setErrors({});
       const schema = Yup.object().shape({
@@ -35,12 +38,17 @@ const SignIn: React.FC = () => {
       await schema.validate(data, {
         abortEarly: false,
       });
+
+      signIn({
+        email: data.email,
+        password: data.password,
+      });
     } catch (err) {
       const erros = getValidationErros(err);
 
       formRef.current?.setErrors(erros);
     }
-  }, []);
+  }, [signIn]);
 
   return (
     <Container>
